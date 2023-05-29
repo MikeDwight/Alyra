@@ -6,7 +6,7 @@
 // lorsque j'ai pris connaissance de l'énnoncé j'était complétement perdu,
 // mais j'ai finalement appris beaucoup de choses.
 
-// PS : mon mettre en perspective ce code et mon niveau, j'ai passé environ 12h sur l'élaboration de ce smart contract.
+// PS : Pour mettre en perspective ce code et mon niveau, j'ai passé environ 12h sur l'élaboration de ce smart contract.
 
 // Bonne lecture / correction ! :)
 
