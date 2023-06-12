@@ -34,6 +34,13 @@ Pour installer et exécuter ce projet localement, suivez ces étapes :
 **NB : les méthodes 'ethers', 'expect' et 'assert' sont fournis avec l'installation de Hardhat. Les méthodes 'expectRevert' et 'expectEvent' sont disponibles en installant la librairie 'test-helpers' de OpenZeppelin :**
 `npm install @openzeppelin/test-helpers`
 
+## Explications
+
+- Pour cet exercice, j'ai éffectué 43 tests pour vérifier le bon fonctionnement des differentes fonctions du contrat 'voting.sol'.
+- J'ai utilisé les méthodes 'ethers', 'expect' et 'assert' (librairies ethers et chai) ainsi que la méthode 'expectRevert' (librairie test-helpers).
+- Avant chaque test, je créer une instance du contrat 'voting.sol' et je le déploie. Je récupère également 3 comptes de tests pour simuler les transactions.
+- Les tests sont organisés en 6 sections que sont : Initialization, Getter, Resgistration, Proposal, Vote et States.
+
 ## Auteurs
 
 - Mickael Alves de Carvalho
