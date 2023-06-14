@@ -6,6 +6,8 @@ import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 /// @title A contract for a voting system
 /// @author Mike Alvs
 
+// test commit
+
 contract Voting is Ownable {
     uint public winningProposalID;
 
