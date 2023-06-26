@@ -7,9 +7,62 @@
 </head>
 <body>
 
-    <h1>Hello</h1>
+    <div style="margin-bottom: 15px;" class="connection">
+        <button id="connectionButton">Se connecter</button>
+    </div>
 
-    <script type="module" src="./index.js"></script>
+    <div class="voting">
+        <div class="addVoter" style="margin-bottom: 15px;">
+            <input type="text" id="adressToWhitelist">
+            <button id="whitelistButton">Ajouter l'adresse</button>
+        </div>
+
+        <div class="getVoter" style="margin-bottom: 15px;">
+            <input type="text" id="adressToCheck">
+            <button id="checkButton">Information du voter :</button>
+            <span id="voterInfo"></span>
+        </div>
+
+        <div class="startProposalPhase" style="margin-bottom: 15px;">
+            <button id="registeringVoters">Ouvrir la session d'enregistrement des voters</button>
+            <button id="startProposalPhase">Ouvrir la session de proposition</button>
+        </div>
+
+        <div class="addOneProposal" style="margin-bottom: 15px;">
+            <input type="text" id="proposalToAdd">
+            <button id="addProposalButton">Ajouter la proposition</button>
+        </div>
+
+        <div class="getOneProposal" style="margin-bottom: 15px;">
+            <input type="number" id="proposalToCheck">
+            <button id="proposalCheckButton">Entrer l'id de la proposition :</button>
+            <span id="proposalInfo"></span>
+        </div>
+
+        <div class="endProposalPhase" style="margin-bottom: 15px;">
+            <button id="endProposalPhase">Fermer la session de proposition</button>
+            <button id="startVotingPhase">Ouvrir la session de vote</button>
+        </div>
+
+        <div class="addVote" style="margin-bottom: 15px;">
+            <input type="text" id="idToVote">
+            <button id="voteButton">À voter !</button>
+        </div>
+
+        <div class="endVotePhase" style="margin-bottom: 15px;">
+            <button id="endVotePhase">Fermer la session de vote</button>
+            <button id="startTallyPhase">Ouvrir la session de tri</button>
+        </div>
+
+        <div class="getWinner" style="margin-bottom: 15px;">
+            <button id="winnerButton">Gagnant :</button>
+            <span id="winner"></span>
+        </div>
+    </div>
+
+
     
+    
+    <script type="module" src="./index.js"></script>
 </body>
 </html>

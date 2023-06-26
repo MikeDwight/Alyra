@@ -110,6 +110,10 @@ contract Voting is Ownable {
 
     // ::::::::::::: STATE ::::::::::::: //
 
+    function startRegisteringVoters() external onlyOwner {
+        workflowStatus = WorkflowStatus.RegisteringVoters;
+    }
+
     function startProposalsRegistering() external onlyOwner {
         require(
             workflowStatus == WorkflowStatus.RegisteringVoters,
