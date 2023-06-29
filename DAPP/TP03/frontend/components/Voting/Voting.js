@@ -11,6 +11,8 @@ import { prepareWriteContract, writeContract, readContract } from '@wagmi/core'
 
 // Contract
 import Contract from '../../../backend/artifacts/contracts/Voting.sol/Voting.json'
+// 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+// 0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199
 
 
 
@@ -93,6 +95,7 @@ const Voting = () => {
         return '';
       };
 
+   
 
 
     // AFFICHAGE
@@ -113,8 +116,26 @@ const Voting = () => {
                 <Flex m={'15px'}>
                     <Input placeholder='Entrez une adresse' onChange={e => setGetVoter(e.target.value)}></Input>
                     <Button onClick={() => getInfoVoter()}>Information</Button>
-                    <Text>{stringifyData(data)}</Text>
                 </Flex>
+                <Text>
+                    {data ? (
+                        <>
+                        <li>
+                            Est-il enregistré ? {data['isRegistered'] ? 'Oui' : 'Non'}
+                        </li>
+                        <li>
+                            A-t-il voté ? {data['hasVoted'] ? 'Oui' : 'Non'}
+                        </li>
+                        <li>
+                            ID de la proposition votée : {data['votedProposalId']}
+                        </li>
+                        </>
+                    ) : (
+                        ''
+                    )}
+                </Text>
+
+
             </Flex>
         ) : (
             <Text>Please connect your wallet</Text>
