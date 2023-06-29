@@ -14,11 +14,23 @@ import Contract from '../../../backend/artifacts/contracts/Voting.sol/Voting.jso
 // 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 // 0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199
 
+// VIEM (pour les events)
+import { createPublicClient, http, parseAbiItem } from 'viem'
+import { hardhat } from 'viem/chains'
+
+import { v4 as uuidv4 } from 'uuid';
+
 
 
 
 
 const Voting = () => {  
+
+    // Create client for Viem
+    const client = createPublicClient({
+        chain: hardhat,
+        transport: http(),
+    })
 
     // Wagmi
     const { isConnected } = useAccount()
@@ -30,6 +42,7 @@ const Voting = () => {
     const [addVoter, setAddVoter] = useState(null)
     const [getVoter, setGetVoter] = useState(null)
     const [data, setData] = useState(null)
+    const [whiteListEvent, setWhiteListEvent] = useState([])
 
     // CONTRACT ADDRESS
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
@@ -47,7 +60,8 @@ const Voting = () => {
                 args: [addVoter],
             })
             await writeContract(request)
-            
+
+            await getEvents()            
 
             toast({
                 title: 'Succès !',
@@ -68,6 +82,7 @@ const Voting = () => {
         }
     }
 
+    // Vérifier les infos d'un voter
     const getInfoVoter = async() => {
         try {
             const data = await readContract({
@@ -85,7 +100,6 @@ const Voting = () => {
 
     const stringifyData = data => {
         if (data) {
-          // Convertir les BigInts en chaînes de caractères
           const serializedData = {
             ...data,
             votedProposalId: data.votedProposalId.toString()
@@ -95,6 +109,25 @@ const Voting = () => {
         return '';
       };
 
+    // Récupérer les event
+    const getEvents = async () => {
+        // Récupérer les events d'ajout de voter
+        const addVoterLogs = await client.getLogs({
+          event: parseAbiItem('event VoterRegistered(address voterAddress)'),
+          fromBlock: 0n,
+          toBlock: 'latest'
+        });
+      
+      
+        // Extraire les adresses whitelistées des logs
+        const whitelistAddresses = addVoterLogs.map(log => log.args.voterAddress);
+        setWhiteListEvent(whitelistAddresses);
+      }
+
+    useEffect(() => {
+        getEvents();
+      }, []);
+      
    
 
 
@@ -110,6 +143,18 @@ const Voting = () => {
                     <Input placeholder='Entrez une adresse' onChange={e => setAddVoter(e.target.value)}></Input>
                     <Button onClick={() => addOneVoter()}>Ajouter</Button>
                 </Flex>
+                <Text>
+                Adresse enregistrée :
+                {whiteListEvent.length > 0 ? (
+                    Array.from(new Set(whiteListEvent)).map((address) => (
+                    <Flex key={uuidv4()}>
+                        <Text>{address}</Text>
+                    </Flex>
+                    ))
+                ) : (
+                    <Text>Aucune adresse ajoutée aux voters</Text>
+                )}
+                </Text>
                 <Heading as={'h1'} size={'xl'}>
                     Obtenir les informations d'un voter
                 </Heading>
