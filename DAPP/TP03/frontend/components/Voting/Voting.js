@@ -75,13 +75,23 @@ const Voting = () => {
                 args: [getVoter],
                 account: getVoter,           
             })
-            console.log(data);
-            return data
             setData(data)
         } catch (err) {
             console.log(err.message)
         }
     }
+
+    const stringifyData = data => {
+        if (data) {
+          // Convertir les BigInts en chaînes de caractères
+          const serializedData = {
+            ...data,
+            votedProposalId: data.votedProposalId.toString()
+          };
+          return JSON.stringify(serializedData);
+        }
+        return '';
+      };
 
 
 
@@ -103,7 +113,7 @@ const Voting = () => {
                 <Flex m={'15px'}>
                     <Input placeholder='Entrez une adresse' onChange={e => setGetVoter(e.target.value)}></Input>
                     <Button onClick={() => getInfoVoter()}>Information</Button>
-                    <Text>{data}</Text>
+                    <Text>{stringifyData(data)}</Text>
                 </Flex>
             </Flex>
         ) : (
