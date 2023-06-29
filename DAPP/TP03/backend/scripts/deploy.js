@@ -7,7 +7,7 @@ async function main() {
   await voting.waitForDeployment();
 
   console.log(
-    `Votig deployed to ${voting.target}`
+    `Voting deployed to ${voting.target}`
   );
 }
 
