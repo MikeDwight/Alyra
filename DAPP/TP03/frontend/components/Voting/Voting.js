@@ -15,7 +15,7 @@ import { prepareWriteContract, writeContract, readContract } from '@wagmi/core'
 // Contract
 import Contract from '../../../backend/artifacts/contracts/Voting.sol/Voting.json'
 // 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
-// 0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199
+//  
 
 // VIEM (pour les events)
 import { createPublicClient, http, parseAbiItem } from 'viem'
@@ -128,14 +128,14 @@ const Voting = () => {
         const whitelistAddresses = addVoterLogs.map(log => log.args.voterAddress);
         setWhiteListEvent(whitelistAddresses);
 
-        // // Récupérer les events de session
-        // const sessionLogs = await client.getLogs({
-        //     event: parseAbiItem('event WorkflowStatusChange(WorkflowStatus previousStatus, WorkflowStatus newStatus)'),
-        //     fromBlock: 0n,
-        //     toBlock: 'latest'
-        //   });
-
-        //   console.log(sessionLogs);
+        // Récupérer les events de session
+        const sessionLogs = await client.getLogs({
+            event: parseAbiItem('event WorkflowStatusChange(uint8 previousStatus, uint8 newStatus)'),
+            fromBlock: 0n,
+            toBlock: 'latest'
+          });
+          
+          console.log(sessionLogs);
           
       }
 
