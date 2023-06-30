@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 
+// Ethers
+import { ethers } from 'ethers'
+
 // Chakra-ui
 import { Flex, Text, Heading, Input, Button, useToast } from '@chakra-ui/react'
 
@@ -18,6 +21,8 @@ import Contract from '../../../backend/artifacts/contracts/Voting.sol/Voting.jso
 import { createPublicClient, http, parseAbiItem } from 'viem'
 import { hardhat } from 'viem/chains'
 
+
+// UUIDV4
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -122,11 +127,53 @@ const Voting = () => {
         // Extraire les adresses whitelistées des logs
         const whitelistAddresses = addVoterLogs.map(log => log.args.voterAddress);
         setWhiteListEvent(whitelistAddresses);
+
+        // // Récupérer les events de session
+        // const sessionLogs = await client.getLogs({
+        //     event: parseAbiItem('event WorkflowStatusChange(WorkflowStatus previousStatus, WorkflowStatus newStatus)'),
+        //     fromBlock: 0n,
+        //     toBlock: 'latest'
+        //   });
+
+        //   console.log(sessionLogs);
+          
       }
 
     useEffect(() => {
         getEvents();
       }, []);
+
+
+      // Fonction pour ouvrir la session de proposal
+    const startProposal = async() => {
+        try {
+            const { request } = await prepareWriteContract({
+                address: contractAddress,
+                abi: Contract.abi,
+                functionName: "startProposalsRegistering",
+            })
+            await writeContract(request)
+
+            await getEvents()            
+
+            toast({
+                title: 'Succès !',
+                description: `Vous avez ouvert la session de proposition`,
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+            })
+        } catch (err) {
+            console.log(err);
+            toast({
+                title: 'Error!',
+                description: 'An error occured.',
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+            })
+        }
+    }
       
    
 
@@ -179,8 +226,9 @@ const Voting = () => {
                         ''
                     )}
                 </Text>
-
-
+                <Flex mt={'30px'} w={'100%'} justifyContent={'center'}>
+                    <Button onClick={() => startProposal()}>Ouvrir la session de proposition</Button>
+                </Flex>
             </Flex>
         ) : (
             <Text>Please connect your wallet</Text>
