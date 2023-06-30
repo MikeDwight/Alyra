@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
 
 // Chakra-ui
-import { Flex, Text, Heading, Input, Button, useToast } from '@chakra-ui/react'
+import { Flex, Text, Heading, Input, Button, useToast, Alert, AlertIcon, AlertTitle, AlertDescription, } from '@chakra-ui/react'
 
 // Wagmi
 import { useAccount } from 'wagmi'
@@ -18,7 +18,7 @@ import Contract from '../../../backend/artifacts/contracts/Voting.sol/Voting.jso
 //  
 
 // VIEM (pour les events)
-import { createPublicClient, http, parseAbiItem } from 'viem'
+import { createPublicClient, http, parseAbiItem, watchContractEvent } from 'viem'
 import { hardhat } from 'viem/chains'
 
 
@@ -48,6 +48,7 @@ const Voting = () => {
     const [getVoter, setGetVoter] = useState(null)
     const [data, setData] = useState(null)
     const [whiteListEvent, setWhiteListEvent] = useState([])
+    const [status, setStatus] = useState(0)
 
     // CONTRACT ADDRESS
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
@@ -129,14 +130,12 @@ const Voting = () => {
         setWhiteListEvent(whitelistAddresses);
 
         // Récupérer les events de session
-        const sessionLogs = await client.getLogs({
-            event: parseAbiItem('event WorkflowStatusChange(uint8 previousStatus, uint8 newStatus)'),
-            fromBlock: 0n,
-            toBlock: 'latest'
+        const sessionLogs = client.watchContractEvent({
+            address: contractAddress,
+            abi: Contract.abi,
+            eventName: "WorkflowStatusChange",
+            onLogs: logs => setStatus(logs[0].args.newStatus)
           });
-          
-          console.log(sessionLogs);
-          
       }
 
     useEffect(() => {
@@ -183,6 +182,20 @@ const Voting = () => {
     <Flex w={'60%'} bg={'#6B4E71'} color={'#F5DDDD'} m={'auto'} p={'50px'}  justifyContent={'center'} alignItems={'center'}>
         {isConnected ? (
             <Flex direction={'column'} width={'100%'}>
+                <Alert status='info' justifyContent={'center'} mb={'30px'}>
+                <AlertIcon />
+                <AlertTitle color={'#000000'}>
+                {status === 0 ? (
+                        <Text>Enregistrement des voters</Text>
+                        ) : status === 1 ? (
+                        <p>Session de proposition</p>
+                        ) : status === 2 ? (
+                        <Text>Session de vote</Text>
+                        )  : (
+                        <Text>Session de depouillement</Text>
+                        )}
+                </AlertTitle>
+                </Alert>
                 <Heading as={'h1'} size={'xl'}>
                     Ajouter un voter
                 </Heading>
