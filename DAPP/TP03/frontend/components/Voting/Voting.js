@@ -48,7 +48,7 @@ const Voting = () => {
     const [getVoter, setGetVoter] = useState(null)
     const [data, setData] = useState(null)
     const [whiteListEvent, setWhiteListEvent] = useState([])
-    const [status, setStatus] = useState(0)
+    const [status, setStatus] = useState(null)
     const [addProposal, setAddProposal] = useState(null)
     const [getProposal, setGetProposal] = useState(null)
     const [dataProposal, setDataProposal] = useState(null)
@@ -110,16 +110,7 @@ const Voting = () => {
         }
     }
 
-    // const stringifyData = data => {
-    //     if (data) {
-    //       const serializedData = {
-    //         ...data,
-    //         votedProposalId: data.votedProposalId.toString()
-    //       };
-    //       return JSON.stringify(serializedData);
-    //     }
-    //     return '';
-    //   };
+    
 
     // Récupérer les event
     const getEvents = async () => {
@@ -136,7 +127,7 @@ const Voting = () => {
         setWhiteListEvent(whitelistAddresses);
 
         // Récupérer les events de session
-        const sessionLogs = client.watchContractEvent({
+        client.watchContractEvent({
             address: contractAddress,
             abi: Contract.abi,
             eventName: "WorkflowStatusChange",
@@ -387,7 +378,7 @@ const Voting = () => {
         }
     }
 
-    // Récuper le gagnant 
+    // Récupere le gagnant 
     const addWinner = async() => {
         try {
             const data = await readContract({
@@ -416,8 +407,8 @@ const Voting = () => {
                 <Alert status='info' justifyContent={'center'} mb={'30px'}>
                 <AlertIcon />
                 <AlertTitle color={'#000000'}>
-                {status === 0 ? (
-                        <Text>Enregistrement des voters</Text>
+                {status === 5 ? (
+                        <Text>Session de depouillement</Text>
                         ) : status === 1 ? (
                         <Text>Session de proposition</Text>
                         ) : status === 2 ? (
@@ -427,7 +418,7 @@ const Voting = () => {
                         ) : status === 4 ? (
                         <Text>Session de vote fermée</Text>
                         ) : (
-                        <Text>Session de depouillement</Text>
+                        <Text>Enregistrement des voters</Text>
                         )}
                 </AlertTitle>
                 </Alert>
