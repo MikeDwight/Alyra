@@ -51,7 +51,9 @@ const Voting = () => {
     const [status, setStatus] = useState(null)
     const [addProposal, setAddProposal] = useState(null)
     const [getProposal, setGetProposal] = useState(null)
+    const [arrayProposal, setArrayProposal] = useState([])
     const [nbProposal, setNbProposal] = useState(0)
+    const [idProposal, setIdProposal] = useState([])
     const [dataProposal, setDataProposal] = useState(null)
     const [addVote, setAddVote] = useState(null)
     const [nbVote, setNbVote] = useState(0)
@@ -187,6 +189,32 @@ const Voting = () => {
         }
     }
 
+    const displayAllProposals = async () => {
+        try {
+          const proposalCount = nbProposal; // Remplacez par le nombre total de propositions
+      
+          for (let i = 1; i <= proposalCount; i++) {
+            const data = await readContract({
+              address: contractAddress,
+              abi: Contract.abi,
+              functionName: "getOneProposal",
+              args: [i],
+            });
+      
+            console.log(`Proposal ID: ${i}`);
+            console.log(`Description: ${data.description}`);
+            console.log("--------------------");
+
+
+      
+            // Vous pouvez également ajouter ces informations à un tableau ou un état de votre choix
+            // en utilisant la fonction setDataProposal ou en poussant les données dans un tableau
+          }
+        } catch (err) {
+          console.log(err.message);
+        }
+      };
+      
     
 
     // Fonction pour ajouter une proposition
@@ -203,8 +231,9 @@ const Voting = () => {
             setArrayProposal(prevArray => [...prevArray, addProposal]);
             
 
-           
+            
             await getEvents()  
+            await displayAllProposals();
             
             
 
@@ -229,6 +258,8 @@ const Voting = () => {
 
     
 
+    
+
     // Vérifier les infos d'une propositon
     const getInfoProposal = async() => {
         try {
@@ -236,8 +267,7 @@ const Voting = () => {
                 address: contractAddress,
                 abi: Contract.abi,
                 functionName: "getOneProposal",
-                args: [getProposal],
-                          
+                args: [getProposal],  
             })
             setDataProposal(data.description)
         } catch (err) {
@@ -551,7 +581,9 @@ const Voting = () => {
                 </Flex>
                 <Text>
                 Proposition : {dataProposal}<br />
-                Nombre de proposition : {nbProposal}
+                Nombre de proposition : {nbProposal}<br />
+                Liste :<br />
+                `${data.description}`
                 </Text>
                 <Flex mt={'30px'} w={'100%'} justifyContent={'center'}>
                     <Button onClick={() => endProposal()}>Fermer la session de proposition</Button>
