@@ -51,9 +51,7 @@ const Voting = () => {
     const [status, setStatus] = useState(null)
     const [addProposal, setAddProposal] = useState(null)
     const [getProposal, setGetProposal] = useState(null)
-    const [arrayProposal, setArrayProposal] = useState([])
     const [nbProposal, setNbProposal] = useState(0)
-    const [idProposal, setIdProposal] = useState([])
     const [dataProposal, setDataProposal] = useState(null)
     const [addVote, setAddVote] = useState(null)
     const [nbVote, setNbVote] = useState(0)
@@ -137,8 +135,6 @@ const Voting = () => {
         
           // Extraire les adresses whitelistées des logs
           const proposals = addProposalLogs.map(log => log.args);
-          
-          console.log(proposals);
 
 
           // Affiche le nombre de proposition
