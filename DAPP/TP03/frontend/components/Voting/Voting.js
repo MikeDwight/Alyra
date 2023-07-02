@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
 
 // Chakra-ui
-import { Flex, Text, Heading, Input, Button, useToast, Alert, AlertIcon, AlertTitle, AlertDescription, } from '@chakra-ui/react'
+import { Box, Flex, Text, Heading, Input, Button, useToast, Alert, AlertIcon, AlertTitle, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, } from '@chakra-ui/react'
 
 // Wagmi
 import { useAccount } from 'wagmi'
@@ -51,8 +51,12 @@ const Voting = () => {
     const [status, setStatus] = useState(null)
     const [addProposal, setAddProposal] = useState(null)
     const [getProposal, setGetProposal] = useState(null)
+    const [arrayProposal, setArrayProposal] = useState([])
+    const [nbProposal, setNbProposal] = useState(0)
+    const [idProposal, setIdProposal] = useState([])
     const [dataProposal, setDataProposal] = useState(null)
     const [addVote, setAddVote] = useState(null)
+    const [nbVote, setNbVote] = useState(0)
     const [winner, setWinner] = useState(0)
 
     // CONTRACT ADDRESS
@@ -104,7 +108,6 @@ const Voting = () => {
                 account: getVoter,           
             })
             setData(data)
-            console.log(data);
         } catch (err) {
             console.log(err.message)
         }
@@ -121,10 +124,27 @@ const Voting = () => {
           toBlock: 'latest'
         });
       
-      
         // Extraire les adresses whitelistées des logs
         const whitelistAddresses = addVoterLogs.map(log => log.args.voterAddress);
         setWhiteListEvent(whitelistAddresses);
+
+        // Récupérer les events d'ajout de proposal
+        const addProposalLogs = await client.getLogs({
+            event: parseAbiItem('event ProposalRegistered(uint proposalId)'),
+            fromBlock: 0n,
+            toBlock: 'latest'
+          });
+        
+          // Extraire les adresses whitelistées des logs
+          const proposals = addProposalLogs.map(log => log.args);
+          
+          console.log(proposals);
+
+
+          // Affiche le nombre de proposition
+        setNbProposal(proposals.length);
+       
+        
 
         // Récupérer les events de session
         client.watchContractEvent({
@@ -171,6 +191,7 @@ const Voting = () => {
         }
     }
 
+    
 
     // Fonction pour ajouter une proposition
     const addOneProposal = async() => {
@@ -182,7 +203,14 @@ const Voting = () => {
                 args: [addProposal],
             })
             await writeContract(request)
-      
+
+            setArrayProposal(prevArray => [...prevArray, addProposal]);
+            
+
+           
+            await getEvents()  
+            
+            
 
             toast({
                 title: 'Succès !',
@@ -294,6 +322,8 @@ const Voting = () => {
                 args: [addVote],
             })
             await writeContract(request)
+
+            setNbVote(nbVote + 1)
     
 
             toast({
@@ -379,18 +409,40 @@ const Voting = () => {
     }
 
     // Récupere le gagnant 
-    const addWinner = async() => {
-        try {
-            const data = await readContract({
-                address: contractAddress,
-                abi: Contract.abi,
-                functionName: 'winningProposalID',
-              }); 
-                setWinner(data)       
-        } catch (err) {
-            console.log(err);
+    
+        const addWinnerId = async() => {
+            try {
+                const data = await readContract({
+                    address: contractAddress,
+                    abi: Contract.abi,
+                    functionName: 'winningProposalID',
+                  }); 
+                    setWinner(data)    
+            } catch (err) {
+                console.log(err);
+            }
         }
-    }
+        const addWinnerDesc = async() => {
+            try {
+                const data = await readContract({
+                    address: contractAddress,
+                    abi: Contract.abi,
+                    functionName: "getOneProposal",
+                    args: [winner],
+                              
+                })
+                setDataProposal(data.description)    
+
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        const addWinner = async() => { 
+            await addWinnerId()
+            await addWinnerDesc()
+        }
+   
 
         
    
@@ -429,18 +481,34 @@ const Voting = () => {
                     <Input placeholder='Entrez une adresse' onChange={e => setAddVoter(e.target.value)}></Input>
                     <Button onClick={() => addOneVoter()}>Ajouter</Button>
                 </Flex>
-                <Text>
-                Adresse enregistrée :
-                {whiteListEvent.length > 0 ? (
-                    Array.from(new Set(whiteListEvent)).map((address) => (
-                    <Flex key={uuidv4()}>
-                        <Text>{address}</Text>
-                    </Flex>
-                    ))
-                ) : (
-                    <Text>Aucune adresse ajoutée aux voters</Text>
-                )}
-                </Text>
+                <Accordion defaultIndex={[0]} allowMultiple>
+                    <AccordionItem>
+                        <h2>
+                        <AccordionButton>
+                            <Box as="span" flex='1' textAlign='left'>
+                            {whiteListEvent.length > 0 ? (
+                        <Flex key={uuidv4()} direction={'column'}>
+                        {whiteListEvent.length === 1 ? (
+                            <Text>Adresse enregistrée ({whiteListEvent.length}) :</Text>
+                        ) : (
+                            <Text>Adresses enregistrées ({whiteListEvent.length}) :</Text>
+                        )}
+                        
+                        </Flex>
+                    ) : (
+                        <Text>Aucune adresse ajoutée aux voters</Text>
+                    )}
+                            </Box>
+                            <AccordionIcon />
+                        </AccordionButton>
+                        </h2>
+                        <AccordionPanel pb={4}>
+                        {Array.from(new Set(whiteListEvent)).map((address) => (
+                            <span key={address}>- {address}<br /></span>
+                        ))}
+                        </AccordionPanel>
+                    </AccordionItem>
+                </Accordion>
                 <Heading as={'h1'} size={'xl'}>
                     Obtenir les informations d'un voter
                 </Heading>
@@ -457,9 +525,11 @@ const Voting = () => {
                         <li>
                             A-t-il voté ? {data['hasVoted'] ? 'Oui' : 'Non'}
                         </li>
-                        <li>
+                        {data['hasVoted'] ? (
+                            <li>
                             ID de la proposition votée : {data['votedProposalId'].toString()}
-                        </li>
+                            </li>
+                        ) : ''}
                         </>
                     ) : (
                         ''
@@ -474,6 +544,7 @@ const Voting = () => {
                 <Flex m={'15px'}>
                     <Input placeholder='Entrez une proposition' onChange={e => setAddProposal(e.target.value)}></Input>
                     <Button onClick={() => addOneProposal()}>Ajouter</Button>
+
                 </Flex>
                 <Heading as={'h1'} size={'xl'}>
                     Trouver une proposition
@@ -483,7 +554,8 @@ const Voting = () => {
                     <Button onClick={() => getInfoProposal()}>Voir</Button>
                 </Flex>
                 <Text>
-                Proposition : {dataProposal}
+                Proposition : {dataProposal}<br />
+                Nombre de proposition : {nbProposal}
                 </Text>
                 <Flex mt={'30px'} w={'100%'} justifyContent={'center'}>
                     <Button onClick={() => endProposal()}>Fermer la session de proposition</Button>
@@ -497,7 +569,9 @@ const Voting = () => {
                 <Flex m={'15px'}>
                     <Input placeholder='Entrez un vote' onChange={e => setAddVote(e.target.value)}></Input>
                     <Button onClick={() => addOneVote()}>Ajouter</Button>
+                    
                 </Flex>
+                <Text>Nombre de vote : {nbVote}</Text>
                 <Flex mt={'30px'} w={'100%'} justifyContent={'center'}>
                     <Button onClick={() => endVote()}>Fermer la session de vote</Button>
                 </Flex>
@@ -507,10 +581,10 @@ const Voting = () => {
                 <Heading as={'h1'} size={'xl'}>
                 Voir le gagnant
                 </Heading>
-                <Flex m={'15px'}>
+                <Flex m={'15px'} justifyContent={'center'} direction={'column'}>
                     <Button onClick={() => addWinner()}>Gagnant ?</Button>
-                    <Text>
-                    Gagnant : {winner.toString()}
+                    <Text textAlign={'center'}> 
+                    {winner.toString() == 0 ? ("") : (<Text>{winner.toString()} - {dataProposal}</Text>)}
                     </Text>
                 </Flex>
             </Flex>
