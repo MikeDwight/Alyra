@@ -51,7 +51,7 @@ const Voting = () => {
     const [status, setStatus] = useState(null)
     const [addProposal, setAddProposal] = useState(null)
     const [getProposal, setGetProposal] = useState(null)
-    const [arrayProposal, setArrayProposal] = useState([])
+    const [proposalList, setProposalList] = useState([]);
     const [nbProposal, setNbProposal] = useState(0)
     const [idProposal, setIdProposal] = useState([])
     const [dataProposal, setDataProposal] = useState(null)
@@ -113,6 +113,32 @@ const Voting = () => {
         }
     }
 
+    const displayAllProposals = async () => {
+        try {
+            const proposalCount = nbProposal; // Remplacez par le nombre total de propositions
+            const proposals = [];
+    
+            for (let i = 1; i <= proposalCount; i++) {
+            const data = await readContract({
+                address: contractAddress,
+                abi: Contract.abi,
+                functionName: "getOneProposal",
+                args: [i],
+            });
+    
+            const proposalInfo = {
+                id: i,
+                description: data.description,
+            };
+    
+            proposals.push(proposalInfo);
+            }
+    
+            setProposalList(proposals);
+        } catch (err) {
+            console.log(err.message);
+        }
+        };
     
 
     // Récupérer les event
@@ -141,6 +167,9 @@ const Voting = () => {
 
           // Affiche le nombre de proposition
         setNbProposal(proposals.length);
+
+
+        await displayAllProposals();
        
         
 
@@ -189,31 +218,8 @@ const Voting = () => {
         }
     }
 
-    const displayAllProposals = async () => {
-        try {
-          const proposalCount = nbProposal; // Remplacez par le nombre total de propositions
-      
-          for (let i = 1; i <= proposalCount; i++) {
-            const data = await readContract({
-              address: contractAddress,
-              abi: Contract.abi,
-              functionName: "getOneProposal",
-              args: [i],
-            });
-      
-            console.log(`Proposal ID: ${i}`);
-            console.log(`Description: ${data.description}`);
-            console.log("--------------------");
 
-
-      
-            // Vous pouvez également ajouter ces informations à un tableau ou un état de votre choix
-            // en utilisant la fonction setDataProposal ou en poussant les données dans un tableau
-          }
-        } catch (err) {
-          console.log(err.message);
-        }
-      };
+    
       
     
 
@@ -228,12 +234,14 @@ const Voting = () => {
             })
             await writeContract(request)
 
-            setArrayProposal(prevArray => [...prevArray, addProposal]);
+           
             
 
-            
             await getEvents()  
-            await displayAllProposals();
+
+
+            
+            
             
             
 
@@ -582,8 +590,15 @@ const Voting = () => {
                 <Text>
                 Proposition : {dataProposal}<br />
                 Nombre de proposition : {nbProposal}<br />
-                Liste :<br />
-                `${data.description}`
+                
+                </Text>
+                <Text>
+                Liste :
+                {proposalList.map((proposal) => (
+                    <div key={proposal.id}>
+                    {proposal.id}) {proposal.description}
+                    </div>
+                ))}
                 </Text>
                 <Flex mt={'30px'} w={'100%'} justifyContent={'center'}>
                     <Button onClick={() => endProposal()}>Fermer la session de proposition</Button>
