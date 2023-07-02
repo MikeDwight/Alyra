@@ -236,7 +236,7 @@ const Voting = () => {
 
            
             
-
+            await displayAllProposals();
             await getEvents()  
 
 
