@@ -10,7 +10,7 @@ import { Box, Flex, Text, Heading, Input, Button, useToast, Alert, AlertIcon, Al
 
 // Wagmi
 import { useAccount } from 'wagmi'
-import { prepareWriteContract, writeContract, readContract } from '@wagmi/core'
+import { prepareWriteContract, writeContract, readContract, watchContractEvent } from '@wagmi/core'
 
 // Contract
 import Contract from '../../../backend/artifacts/contracts/Voting.sol/Voting.json'
@@ -18,7 +18,7 @@ import Contract from '../../../backend/artifacts/contracts/Voting.sol/Voting.jso
 // 0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199
 
 // VIEM (pour les events)
-import { createPublicClient, http, parseAbiItem, watchContractEvent } from 'viem'
+import { createPublicClient, http, parseAbiItem } from 'viem'
 import { hardhat } from 'viem/chains'
 
 
@@ -139,6 +139,17 @@ const Voting = () => {
             console.log(err.message);
         }
         };
+
+        watchContractEvent(
+            {
+                address: contractAddress,
+                abi: Contract.abi,
+                eventName: "ProposalRegistered",
+            },
+            (log) => {
+                displayAllProposals();
+            }
+        );
     
 
     // Récupérer les event
@@ -237,13 +248,8 @@ const Voting = () => {
            
             
             await displayAllProposals();
-            await getEvents()  
-
-
-            
-            
-            
-            
+            await getEvents()
+   
 
             toast({
                 title: 'Succès !',
@@ -512,10 +518,10 @@ const Voting = () => {
                     Ajouter un voter
                 </Heading>
                 <Flex m={'15px'}>
-                    <Input placeholder='Entrez une adresse' onChange={e => setAddVoter(e.target.value)}></Input>
+                    <Input placeholder='Entrez une adresse' onChange={e => setAddVoter(e.target.value)} style={{ marginRight: '10px' }}></Input>
                     <Button onClick={() => addOneVoter()}>Ajouter</Button>
                 </Flex>
-                <Accordion defaultIndex={[0]} allowMultiple>
+                <Accordion defaultIndex={[]} allowMultiple border={'1px #3A4454 solid'} borderRadius={'15px'} bg={'#F5DDDD'} color={"#3A4454"} >
                     <AccordionItem>
                         <h2>
                         <AccordionButton>
@@ -543,12 +549,12 @@ const Voting = () => {
                         </AccordionPanel>
                     </AccordionItem>
                 </Accordion>
-                <Heading as={'h1'} size={'xl'}>
+                <Heading as={'h1'} size={'xl'} mt={'30px'}>
                     Obtenir les informations d'un voter
                 </Heading>
                 <Flex m={'15px'}>
-                    <Input placeholder='Entrez une adresse' onChange={e => setGetVoter(e.target.value)}></Input>
-                    <Button onClick={() => getInfoVoter()}>Information</Button>
+                    <Input placeholder='Entrez une adresse' onChange={e => setGetVoter(e.target.value)} style={{ marginRight: '10px' }}></Input>
+                    <Button  onClick={() => getInfoVoter()}>Information</Button>
                 </Flex>
                 <Text>
                     {data ? (
@@ -569,14 +575,14 @@ const Voting = () => {
                         ''
                     )}
                 </Text>
-                <Flex mt={'30px'} w={'100%'} justifyContent={'center'}>
+                <Flex mt={'30px'} mb={'30px'} w={'100%'} justifyContent={'center'}>
                     <Button onClick={() => startProposal()}>Ouvrir la session de proposition</Button>
                 </Flex>
                 <Heading as={'h1'} size={'xl'}>
                     Ajouter une proposition
                 </Heading>
                 <Flex m={'15px'}>
-                    <Input placeholder='Entrez une proposition' onChange={e => setAddProposal(e.target.value)}></Input>
+                    <Input placeholder='Entrez une proposition' onChange={e => setAddProposal(e.target.value)} style={{ marginRight: '10px' }}></Input>
                     <Button onClick={() => addOneProposal()}>Ajouter</Button>
 
                 </Flex>
@@ -584,41 +590,56 @@ const Voting = () => {
                     Trouver une proposition
                 </Heading>
                 <Flex m={'15px'}>
-                    <Input placeholder="Entrez l'id de la proposition" onChange={e => setGetProposal(e.target.value)}></Input>
+                    <Input placeholder="Entrez l'id de la proposition" onChange={e => setGetProposal(e.target.value)} style={{ marginRight: '10px' }}></Input>
                     <Button onClick={() => getInfoProposal()}>Voir</Button>
                 </Flex>
+                <Flex justifyContent={'center'} mb={'30px'}>
+                <Heading as={'h2'} size={'l'}>Résultat de recherche : {dataProposal}<br /></Heading>
+                </Flex>
+                
                 <Text>
-                Proposition : {dataProposal}<br />
+                
                 Nombre de proposition : {nbProposal}<br />
                 
                 </Text>
                 <Text>
-                Liste :
-                {proposalList.map((proposal) => (
+                
+                
+                </Text>
+                <Accordion defaultIndex={[]} allowMultiple border={'1px #3A4454 solid'} borderRadius={'15px'} bg={'#F5DDDD'} color={"#3A4454"} >
+                    <AccordionItem>
+                        <h2>
+                        <AccordionButton>
+                            <Box as="span" flex='1' textAlign='left'>
+                            Liste :
+                            </Box>
+                            <AccordionIcon />
+                        </AccordionButton>
+                        </h2>
+                        <AccordionPanel pb={4}>
+                        {proposalList.map((proposal) => (
                     <div key={proposal.id}>
-                    {proposal.id}) {proposal.description}
+                    {proposal.id} : {proposal.description}
                     </div>
                 ))}
-                </Text>
-                <Flex mt={'30px'} w={'100%'} justifyContent={'center'}>
+                        </AccordionPanel>
+                    </AccordionItem>
+                </Accordion>
+                <Flex mt={'30px'} mb={'30px'} w={'100%'} justifyContent={'space-around'}>
                     <Button onClick={() => endProposal()}>Fermer la session de proposition</Button>
-                </Flex>
-                <Flex mt={'30px'} w={'100%'} justifyContent={'center'}>
                     <Button onClick={() => startVote()}>Ouvrir la session de vote</Button>
                 </Flex>
                 <Heading as={'h1'} size={'xl'}>
                    Voter pour une proposition
                 </Heading>
                 <Flex m={'15px'}>
-                    <Input placeholder='Entrez un vote' onChange={e => setAddVote(e.target.value)}></Input>
-                    <Button onClick={() => addOneVote()}>Ajouter</Button>
+                    <Input placeholder='Entrez un vote' onChange={e => setAddVote(e.target.value)} style={{ marginRight: '10px' }}></Input>
+                    <Button onClick={() => addOneVote()}>Voter</Button>
                     
                 </Flex>
                 <Text>Nombre de vote : {nbVote}</Text>
-                <Flex mt={'30px'} w={'100%'} justifyContent={'center'}>
+                <Flex mt={'30px'} mb={'30px'} w={'100%'} justifyContent={'space-around'}>
                     <Button onClick={() => endVote()}>Fermer la session de vote</Button>
-                </Flex>
-                <Flex mt={'30px'} w={'100%'} justifyContent={'center'}>
                     <Button onClick={() => startTally()}>Ouvrir la session de tri</Button>
                 </Flex>
                 <Heading as={'h1'} size={'xl'}>
