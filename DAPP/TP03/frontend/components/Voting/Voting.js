@@ -24,6 +24,7 @@ import { hardhat } from 'viem/chains'
 
 // UUIDV4
 import { v4 as uuidv4 } from 'uuid';
+import { client } from '@/config'
 
 
 
@@ -31,11 +32,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const Voting = () => {  
 
-    // Create client for Viem
-    const client = createPublicClient({
-        chain: hardhat,
-        transport: http(),
-    })
+    
 
     // Wagmi
     const { isConnected } = useAccount()
@@ -156,10 +153,12 @@ const Voting = () => {
     const getEvents = async () => {
         // Récupérer les events d'ajout de voter
         const addVoterLogs = await client.getLogs({
-          event: parseAbiItem('event VoterRegistered(address voterAddress)'),
-          fromBlock: 0n,
-          toBlock: 'latest'
-        });
+            address: contractAddress,
+            event: parseAbiItem('event VoterRegistered(address voterAddress)'),
+            fromBlock: BigInt(Number(await client.getBlockNumber()) - 15000) < 0 ? 0n : BigInt(Number(await client.getBlockNumber()) - 15000),
+        }); 
+
+        console.log(addVoterLogs);
       
         // Extraire les adresses whitelistées des logs
         const whitelistAddresses = addVoterLogs.map(log => log.args.voterAddress);
@@ -167,9 +166,9 @@ const Voting = () => {
 
         // Récupérer les events d'ajout de proposal
         const addProposalLogs = await client.getLogs({
+            address: contractAddress,
             event: parseAbiItem('event ProposalRegistered(uint proposalId)'),
-            fromBlock: 0n,
-            toBlock: 'latest'
+            fromBlock: BigInt(Number(await client.getBlockNumber()) - 15000) < 0 ? 0n : BigInt(Number(await client.getBlockNumber()) - 15000),
           });
         
           // Extraire les adresses whitelistées des logs

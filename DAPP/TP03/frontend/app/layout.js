@@ -1,6 +1,7 @@
 "use client"
 import { ChakraProvider } from "@chakra-ui/react"
 
+
 import '@rainbow-me/rainbowkit/styles.css';
 import {
   getDefaultWallets,
@@ -8,21 +9,21 @@ import {
 } from '@rainbow-me/rainbowkit';
 import { configureChains, createConfig, WagmiConfig } from 'wagmi';
 import {
-  hardhat
+  hardhat, mainnet, sepolia
 } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 
 const { chains, publicClient } = configureChains(
-  [hardhat],
+  [hardhat, mainnet, sepolia],
   [
     publicProvider()
   ]
 );
 
 const { connectors } = getDefaultWallets({
-  appName: 'Voting DAPP',
-  projectId: '21d05c08bbef0b22d892d979ec3699c6',
-  chains
+  appName: process.env.NEXT_PUBLIC_WALLETCONNECT_APPNAME,
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECTID,
+  chains,
 });
 
 const wagmiConfig = createConfig({
