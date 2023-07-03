@@ -13,7 +13,7 @@ import { useAccount } from 'wagmi'
 import { prepareWriteContract, writeContract, readContract, watchContractEvent } from '@wagmi/core'
 
 // Contract
-import Contract from '../../../backend/artifacts/contracts/Voting.sol/Voting.json'
+import Contract from '@/config/Voting.json'
 // 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 // 0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199
 
