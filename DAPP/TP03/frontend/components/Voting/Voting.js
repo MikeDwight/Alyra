@@ -50,11 +50,11 @@ const Voting = () => {
     const [getProposal, setGetProposal] = useState(null)
     const [proposalList, setProposalList] = useState([]);
     const [nbProposal, setNbProposal] = useState(0)
-    const [idProposal, setIdProposal] = useState([])
     const [dataProposal, setDataProposal] = useState(null)
     const [addVote, setAddVote] = useState(null)
     const [nbVote, setNbVote] = useState(0)
     const [winner, setWinner] = useState(0)
+    const [winnerDesc, setWinnerDesc] = useState(null)
 
     // CONTRACT ADDRESS
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
@@ -180,6 +180,8 @@ const Voting = () => {
 
 
         await displayAllProposals();
+
+        
        
         
 
@@ -470,7 +472,8 @@ const Voting = () => {
                     args: [winner],
                               
                 })
-                setDataProposal(data.description)    
+                setWinnerDesc(data.description)   
+                console.log(winnerDesc); 
 
             } catch (err) {
                 console.log(err);
@@ -481,7 +484,9 @@ const Voting = () => {
             await addWinnerId()
             await addWinnerDesc()
         }
-   
+
+
+        
 
         
    
@@ -647,7 +652,7 @@ const Voting = () => {
                 <Flex m={'15px'} justifyContent={'center'} direction={'column'}>
                     <Button onClick={() => addWinner()}>Gagnant ?</Button>
                     <Text textAlign={'center'}> 
-                    {winner.toString() == 0 ? ("") : (<Text>{winner.toString()} - {dataProposal}</Text>)}
+                    {winner.toString() == 0 ? ("") : (<Text>{winner.toString()}</Text>)}
                     </Text>
                 </Flex>
             </Flex>
