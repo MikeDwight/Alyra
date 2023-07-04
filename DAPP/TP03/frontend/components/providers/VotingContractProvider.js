@@ -11,8 +11,9 @@ export const VotingContractProvider = ({ children }) => {
     isOwner,
     isVoter,
     setIsVoter,
-    votingIsConnected,
     contract,
+    isworkflowStatusStep,
+    setworkflowStatusStep,
   } = useVotingContract();
 
   const values = useMemo(
@@ -22,10 +23,20 @@ export const VotingContractProvider = ({ children }) => {
       isOwner,
       isVoter,
       setIsVoter,
-      votingIsConnected,
       contract,
+      isworkflowStatusStep,
+      setworkflowStatusStep,
     }),
-    [owner, setOwner, isOwner, isVoter, setIsVoter, votingIsConnected, contract]
+    [
+      owner,
+      setOwner,
+      isOwner,
+      isVoter,
+      setIsVoter,
+      isworkflowStatusStep,
+      setworkflowStatusStep,
+      contract,
+    ]
   );
 
   // Contexts

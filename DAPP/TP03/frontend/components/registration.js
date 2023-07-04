@@ -17,6 +17,12 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  Accordion,
+  Box,
+  AccordionIcon,
 } from "@chakra-ui/react";
 
 // Wagmi
@@ -164,6 +170,47 @@ const Registration = () => {
           Information
         </Button>
       </Flex>
+      <Accordion
+        defaultIndex={[]}
+        allowMultiple
+        border={"1px #3A4454 solid"}
+        borderRadius={"15px"}
+        bg={"#F5DDDD"}
+        color={"#3A4454"}
+      >
+        <AccordionItem>
+          <h2>
+            <AccordionButton>
+              <Box as="span" flex="1" textAlign="left">
+                {whiteListEvent.length > 0 ? (
+                  <Flex key={uuidv4()} direction={"column"}>
+                    {whiteListEvent.length === 1 ? (
+                      <Text>
+                        Adresse enregistrée ({whiteListEvent.length}) :
+                      </Text>
+                    ) : (
+                      <Text>
+                        Adresses enregistrées ({whiteListEvent.length}) :
+                      </Text>
+                    )}
+                  </Flex>
+                ) : (
+                  <Text>Aucune adresse ajoutée aux voters</Text>
+                )}
+              </Box>
+              <AccordionIcon />
+            </AccordionButton>
+          </h2>
+          <AccordionPanel pb={4}>
+            {Array.from(new Set(whiteListEvent)).map((address) => (
+              <span key={address}>
+                - {address}
+                <br />
+              </span>
+            ))}
+          </AccordionPanel>
+        </AccordionItem>
+      </Accordion>
 
       {data && (
         <Flex direction="column" align="center" mt={4}>

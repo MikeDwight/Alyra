@@ -11,16 +11,17 @@ export default function useVotingContract() {
 
   // init state
   const [contract, setContract] = useState({});
-  const [owner, setOwner] = useState(null);
-  const [isVoter, setIsVoter] = useState(false);
+  const [owner, setOwner] = useState(false);
+  const [isVoter, setIsVoter] = useState(null);
   const [isOwner, setIsOwner] = useState(null);
-  const [votingIsConnected, setVotingIsConnected] = useState(null);
+  const [isworkflowStatusStep, setworkflowStatusStep] = useState(0);
 
   // Init
   useEffect(() => {
     if (!isConnected) return;
     try {
       loadContract();
+      checkRoles();
     } catch (error) {
       console.log(error.message);
     }
@@ -41,16 +42,18 @@ export default function useVotingContract() {
         ? await voting.read.owner()
         : null;
 
-      const wfStatus = await voting.read.workflowStatus();
+      // console.log("useVotingContract : address owner ", owner);
+
+      const workflowStatusStep = await voting.read.workflowStatus();
+      console.log("voting js :", workflowStatusStep);
 
       // Set state hook
       setContract(voting);
       setOwner(owner);
       setIsOwner(owner === address);
-      setVotingIsConnected(true);
+      setworkflowStatusStep(workflowStatusStep);
     } catch (error) {
-      setVotingIsConnected(false);
-      console.log(err.message);
+      console.log(error.message);
     }
   };
 
@@ -62,10 +65,16 @@ export default function useVotingContract() {
   const checkRoles = async () => {
     try {
       const Voter = await getVoter(address);
-      if (Voter) setIsVoter(true);
+      if (Voter && Voter.isRegistered) {
+        setIsVoter(true);
+      } else {
+        setIsVoter(false);
+      }
+      console.log("checkroles : address isVoter ", Voter);
     } catch (error) {
       setIsVoter(false);
     }
+
     try {
       const owner = isAddress(await contract.read.owner())
         ? await contract.read.owner()
@@ -85,13 +94,14 @@ export default function useVotingContract() {
         functionName: "getVoter",
         args: [String(_address)],
       });
+      console.log("useVotingContract : data ", data);
       return data;
-    } catch (err) {
-      console.log(err.message);
+    } catch (error) {
+      console.log(error.message);
     }
   };
 
-  console.log("useVotingContract js :", isVoter);
+  // console.log("useVotingContract : address isVoter ", isVoter);
 
   return {
     owner,
@@ -99,7 +109,8 @@ export default function useVotingContract() {
     isOwner,
     isVoter,
     setIsVoter,
-    votingIsConnected,
     contract,
+    isworkflowStatusStep,
+    setworkflowStatusStep,
   };
 }

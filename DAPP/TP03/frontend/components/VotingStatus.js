@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { ethers } from "ethers";
 import {
   Flex,
@@ -22,6 +22,7 @@ import Contract from "../config/Voting.json";
 import { createPublicClient, http, parseAbiItem } from "viem";
 import { hardhat } from "viem/chains";
 import { v4 as uuidv4 } from "uuid";
+import { VotingContractContext } from "./providers/VotingContractProvider";
 
 const VotingStatus = () => {
   const client = createPublicClient({
@@ -31,7 +32,6 @@ const VotingStatus = () => {
 
   const { isConnected } = useAccount();
   const toast = useToast();
-  const [status, setStatus] = useState(null);
 
   const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
@@ -205,45 +205,36 @@ const VotingStatus = () => {
     }
   };
 
-  const getStatusText = (status) => {
-    switch (status) {
-      case 1:
-        return "Session de proposition";
-      case 2:
-        return "Session de proposition fermée";
-      case 3:
-        return "Session de vote";
-      case 4:
-        return "Session de vote fermée";
-      case 5:
-        return "Session de dépouillement";
-      default:
-        return "Enregistrement des voters";
-    }
-  };
+  // Context
+  const { isworkflowStatusStep } = useContext(VotingContractContext);
 
   return (
-    <Flex bg={"blue"} padding={3} direction={"column"} width={"60%"} m={"auto"}>
-      <Alert status="info" justifyContent={"center"} mb={"30px"}>
-        <AlertIcon />
-        <AlertTitle color={"#000000"}>{getStatusText(status)}</AlertTitle>
-      </Alert>
+    <Flex padding={3} direction={"column"} width={"60%"} m={"auto"}>
       <Flex
         mt={"30px"}
         w={"100%"}
         justifyContent={"center"}
         flexDirection={"column"}
       >
-        <Button>Changer de statut (a configurer)</Button>
-        <Button onClick={() => startProposal()}>
-          Ouvrir la session de proposition
-        </Button>
-        <Button onClick={() => endProposal()}>
-          Fermer la session de proposition
-        </Button>
-        <Button onClick={() => startVote()}>Ouvrir la session de vote</Button>
-        <Button onClick={() => startTally()}>Ouvrir la session de tri</Button>
-        <Button onClick={() => endVote()}>Fermer la session de vote</Button>
+        {isworkflowStatusStep === 0 && (
+          <Button onClick={() => startProposal()}>
+            Ouvrir la session de proposition
+          </Button>
+        )}
+        {isworkflowStatusStep === 1 && (
+          <Button onClick={() => endProposal()}>
+            Fermer la session de proposition
+          </Button>
+        )}
+        {isworkflowStatusStep === 2 && (
+          <Button onClick={() => startVote()}>Ouvrir la session de vote</Button>
+        )}
+        {isworkflowStatusStep === 3 && (
+          <Button onClick={() => endVote()}>Fermer la session de vote</Button>
+        )}
+        {isworkflowStatusStep === 4 && (
+          <Button onClick={() => startTally()}>Ouvrir la session de tri</Button>
+        )}
       </Flex>
     </Flex>
   );
