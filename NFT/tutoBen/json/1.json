@@ -1,0 +1,15 @@
+{
+    "description": "Serum description", 
+    "image": "ipfs://QmS3ywaea3QuqDivXvniEgvMuNChJFECsPEu1pdWywpY22/1.png", 
+    "name": "Serum #1",
+    "attributes": [ {
+        "trait_type": "Color", 
+        "value": "Green"
+      }, 
+      {
+        "display_type": "boost_percentage", 
+        "trait_type": "Stamina Increase", 
+        "value": 30
+      }
+     ]
+  }

@@ -1,0 +1,13 @@
+{"description" : "Mon premier NFT",
+"image" : "QmdM4U4wtEMJk37Vbc75Y9HMDWJSUgW54eeqX9gxq4njkb/1.png",
+"name" : "Un très joli bonhomme",
+"attributes" : [
+    {
+        "trait_type": "Taille", 
+        "value": "165"
+      }, 
+      {
+        "trait_type": "Cheveux", 
+        "value": "Brun"
+      }
+]}

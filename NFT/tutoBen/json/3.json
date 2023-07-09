@@ -1,0 +1,15 @@
+{
+    "description": "Serum description", 
+    "image": "ipfs://QmS3ywaea3QuqDivXvniEgvMuNChJFECsPEu1pdWywpY22/3.png", 
+    "name": "Serum #3",
+    "attributes": [ {
+        "trait_type": "Color", 
+        "value": "Purple"
+      }, 
+      {
+        "display_type": "boost_percentage", 
+        "trait_type": "Stamina Increase", 
+        "value": 80
+      }
+     ]
+  }
